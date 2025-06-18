@@ -1,5 +1,5 @@
 import pickle
-#import matplotlib.pyplot as plt
+
 import tensorflow as tf
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
@@ -28,10 +28,10 @@ parser.add_argument(
 
 
 
-# inputs=parser.parse_args()
+inputs=parser.parse_args()
 
-# dataset_name=inputs.dataset_name
-# res=inputs.resolution
+dataset_name=inputs.dataset_name
+res=inputs.resolution
 
 
 # dataset_name = st.text_input("dataset_name", "sports")
