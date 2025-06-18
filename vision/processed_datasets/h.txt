@@ -1,0 +1,1 @@
+this folder contains processed dataset as a tfrecord file.It's coming from vision_prep.py
