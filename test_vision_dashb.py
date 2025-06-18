@@ -13,18 +13,18 @@ import streamlit as st
 import argparse
 
 
-# parser = argparse.ArgumentParser(
-#     description='training')
-#
-# parser.add_argument(
-#     '-dn',
-#     '--dataset_name',
-#     default='sports')#eurosat,satelimgslocs,sports
-#
-# parser.add_argument(
-#     '-res','--resolution',
-#     type=int,
-#     default=64)
+parser = argparse.ArgumentParser(
+    description='training')
+
+parser.add_argument(
+    '-dn',
+    '--dataset_name',
+    default='sports')#eurosat,satelimgslocs,sports
+
+parser.add_argument(
+    '-res','--resolution',
+    type=int,
+    default=64)
 
 
 
@@ -34,8 +34,8 @@ import argparse
 # res=inputs.resolution
 
 
-dataset_name = st.text_input("dataset_name", "sports")
-res = st.text_input("resolution", "64")
+# dataset_name = st.text_input("dataset_name", "sports")
+# res = int(st.text_input("resolution", "64"))
 
 
 
