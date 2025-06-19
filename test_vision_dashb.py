@@ -5,6 +5,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 import cv2 as cv
 
+import matplotlib.pyplot as plt
 
 import argparse
 
