@@ -69,25 +69,40 @@ if __name__=="__main__":
     parser.add_argument(
         '-did',
         '--drive_id',
-        default=',')    
+        default=',')
 
     parser.add_argument(
         '-hst',
         '--host',
         default='')
-    
+
     parser.add_argument(
         '-prt',
         '--port',
         default='')
-    
+
+    parser.add_argument(
+        '-db',
+        '--database',
+        default='')
+
+    parser.add_argument(
+        '-us',
+        '--user',
+        default='')
+
+    parser.add_argument(
+        '-pass',
+        '--password',
+        default='')
+
     inputs=parser.parse_args()
     
     dataset_name=inputs.dataset_name
     data_source_name=inputs.data_source_name
     drive_id=inputs.drive_id
     
-    sql_d_o=c_sql_d_c(inputs.host,inputs.port,'learning','postgres','12345')
+    sql_d_o=c_sql_d_c(inputs.host, inputs.port, inputs.database, inputs.user,inputs.password)
 
     # dropts='''
     # DROP TABLE Satelimgslocs;
