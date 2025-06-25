@@ -22,7 +22,7 @@ import argparse
 
 
 parser = argparse.ArgumentParser(
-    description='preparation')
+    description='preparation_and_training')
 
 parser.add_argument(
     '-dn',
@@ -34,30 +34,11 @@ parser.add_argument(
     type=int,
     default=64)
 
-parser.add_argument(
-    '-hst',
-    '--host',
-    default='')
-
-parser.add_argument(
-    '-prt',
-    '--port',
-    default='')
-
-parser.add_argument(
-    '-db',
-    '--database',
-    default='')
-
-parser.add_argument(
-    '-us',
-    '--user',
-    default='')
-
-parser.add_argument(
-    '-pass',
-    '--password',
-    default='')
+parser.add_argument('--host', '-hst', type=str, default='', help='Database host')
+parser.add_argument('--port', '-prt', type=str, default='', help='Database port')
+parser.add_argument('--database', '-db', type=str, default='', help='Database name')
+parser.add_argument('--user', '-us', type=str, default='', help='Database user')
+parser.add_argument('--password', '-pass', type=str, default='', help='Database password (not secure!)')
 
 
 # parser.add_argument("--mode", default='client') when you run directly python console,uncomment this
