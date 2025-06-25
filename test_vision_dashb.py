@@ -52,7 +52,7 @@ def prepare(dn):
     # Show the model architecture
     new_model.summary()
 
-    with open(f"vision/output_classification_preparation/{dataset_name}_unique_labels.pkl", "rb") as f:
+    with open(f"vision/unique_labels_folder/{dataset_name}_unique_labels.pkl", "rb") as f:
         unique_labels = pickle.load(f)
     return new_model,unique_labels
 
