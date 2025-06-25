@@ -37,12 +37,28 @@ parser.add_argument(
 parser.add_argument(
     '-hst',
     '--host',
-    default='6.tcp.eu.ngrok.io')
+    default='')
 
 parser.add_argument(
     '-prt',
     '--port',
-    default='12139')
+    default='')
+
+parser.add_argument(
+    '-db',
+    '--database',
+    default='')
+
+parser.add_argument(
+    '-us',
+    '--user',
+    default='')
+
+parser.add_argument(
+    '-pass',
+    '--password',
+    default='')
+
 
 # parser.add_argument("--mode", default='client') when you run directly python console,uncomment this
 
@@ -52,7 +68,7 @@ inputs = parser.parse_args()
 dataset_name = inputs.dataset_name
 res = inputs.resolution
 
-sql_d_o = c_sql_d.c_sql_d_c(inputs.host, inputs.port, 'learning', 'postgres', '12345')
+sql_d_o = c_sql_d.c_sql_d_c(inputs.host, inputs.port, inputs.database, inputs.user,inputs.password)
 
 sdaq_com = f'''
 
