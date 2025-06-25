@@ -59,6 +59,21 @@ def prepare(dn):
 new_model,unique_labels=prepare('sports')
 
 
+@tf.function
+def enter(image_rgb_uint):
+
+    image_rgb = tf.cast(image_rgb_uint, tf.float32)
+
+    n_img = preprocess_input(image_rgb)
+
+    n_img = tf.expand_dims(n_img, 0)
+
+    vs = tf.nn.softmax(new_model(n_img, training=False))  # Replace .predict
+    mv = tf.reduce_max(vs, axis=-1)
+    ind = tf.argmax(vs, axis=-1)
+
+    return tf.squeeze(mv), tf.squeeze(ind)
+
 
 if uploaded_file is not None:
     # Display file name
@@ -68,17 +83,20 @@ if uploaded_file is not None:
     file_content = uploaded_file.read()
     st.write("File size (bytes):", len(file_content))
 
-    image_rgb = tf.image.decode_image(file_content)
 
-    image_rgb = tf.image.resize(image_rgb, [res, res], method='nearest')
+    image_rgb_uint = tf.image.decode_image(file_content)
 
-    st.image(image_rgb.numpy(), caption="Uploaded Image", width=350)
+    image_rgb_uint = tf.image.resize(image_rgb_uint, [res, res], method='nearest')
 
-    image_rgb = tf.cast(image_rgb, tf.float32)
+    st.image(image_rgb_uint.numpy(), caption="Uploaded Image", width=350)
 
-    n_img=preprocess_input(image_rgb)
+    mv,ind=enter(image_rgb_uint)
 
-    n_img=tf.expand_dims(n_img,0)
+    st.write(f"Our prediction is {unique_labels[ind]} and also {100*mv:.2f}% sure.")
+
+    unique_labels
+
+
 
 
 # image = cv.imread(path)
@@ -90,20 +108,5 @@ if uploaded_file is not None:
 
     #import numpy as np
     #tf.nn.softmax(new_model.predict(n_img))
-
-    vs=tf.nn.softmax(new_model.predict(n_img))
-
-    mv=tf.math.reduce_max(vs,axis=-1)
-
-    mv = tf.squeeze(mv)
-
-    ind=tf.math.argmax(vs,axis=-1)
-
-    ind=tf.squeeze(ind)
-
-
-    st.write(f"Our prediction is {unique_labels[ind]} and also {100*mv:.2f}% sure.")
-
-    unique_labels
 
 

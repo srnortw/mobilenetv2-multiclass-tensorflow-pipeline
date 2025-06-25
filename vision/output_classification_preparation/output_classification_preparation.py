@@ -30,4 +30,4 @@ def preparation(all_metad_df,dataset_name):
                                 a)
                      )
     
-    return zipped
+    return zipped,unique_labels
