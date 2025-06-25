@@ -92,7 +92,7 @@ if uploaded_file is not None:
 
     mv,ind=enter(image_rgb_uint)
 
-    st.write(f"Our prediction is {unique_labels[ind]} and also {100*mv:.2f}% sure.")
+    st.write(f"Our prediction is {unique_labels[ind]} with {100*mv:.2f}% confidence.")
 
     unique_labels
 
