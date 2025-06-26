@@ -107,16 +107,9 @@ class images_relationships_c():
         return clusters,centroids,wcss
         
 
-    def pca(self,f,s,wcss,num_clusters=1):#(f,s,wcss)
+    def pca(self,f,s,wcss):#(f,s,wcss)
         
-        
-        
-        fig = plt.figure(figsize=(10, 8))
-        
-        ax = fig.add_subplot(111)#,projection='3d'
-        
-        
-        ax.set_title(f'2D PCA of Images Correlations also Wcss is {wcss}')
+        #ax = fig.add_subplot(111)#,projection='3d'
 
         print(f.shape, s.shape)
 
@@ -134,61 +127,5 @@ class images_relationships_c():
         datas=principal_components[:-cluster_size,:]
         
         centroid=principal_components[-cluster_size:,:]
-        
-        
-        pc_df = pd.DataFrame(data=datas, columns=['PC1', 'PC2'])
-        
-        
-        t=['Image Samples Correlations',f'Its {num_clusters} Clusters Centroids']
-        
-        ax.scatter(pc_df['PC1'], pc_df['PC2'],c='blue',label=f'{t[0]}')#s
-        
-        
-        #ax.legend()
-        # ax.set_xlabel('x')
-        # ax.set_ylabel('y')
-        
-        
-        pc_df = pd.DataFrame(data=centroid, columns=['PC1', 'PC2'])
-        
-        ax.scatter(pc_df['PC1'], pc_df['PC2'],c='red',label=f'{t[1]}')#s
-        
-        
-        ax.legend()
-        ax.set_xlabel('x')
-        ax.set_ylabel('y')
-        
-        plt.show()
-        
-        # for i,j in enumerate(f):
-            
-        #     # # # Standardize the data
-        #     # scaler = StandardScaler()
-        #     data_std =j#scaler.fit_transform(j)
-            
-            
-        #     # Apply PCA
-        #     pca = PCA(n_components=2)#3
-            
-        #     pdb.set_trace()
-        #     principal_components = pca.fit_transform(data_std)
-                
-        #     # Create a DataFrame with the principal components
-        #     pc_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2']) #, 'PC3'
-            
-        #     ax.scatter(pc_df['PC1'], pc_df['PC2'],c=c[i],label=f'{s[i]}')#, pc_df['PC3']
-                
-        #     # Plot the principal components in 3D
-            
-        #     #pdb.set_trace()
 
-        #     #ax.axis((-5,5,-5,5,-5,5))
-                
-        #     ax.legend()
-        #     ax.set_xlabel('x')
-        #     ax.set_ylabel('y')
-        #     #ax.set_ylabel('z')
-        
-        # plt.show()
-
-        return f
+        return datas,centroid,wcss

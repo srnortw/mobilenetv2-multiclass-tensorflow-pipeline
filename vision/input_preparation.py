@@ -242,11 +242,37 @@ def inp_prep_f(zipped,resh,resw,sdaq_df,locs_df,batch_sz):
                         )
 
     zipped_pca = zipped.map(lambda a, b, c, d, e:
-                            tf.numpy_function(iro.pca, [d, e[1], e[2], num_clusters], Tout=tf.float32)
+                            tf.numpy_function(iro.pca, [d, e[1], e[2]], Tout=[tf.float32,tf.float32,tf.float64])
                             )
 
+
+
     print('pca')
-    for _ in zipped_pca:  # .map(lambda a,b,c,d,e,f,g,h,i,j:a) :
+    t = ['Image Samples Correlations', f'Its {num_clusters} Clusters Centroids']
+
+    import pandas as pd
+
+    for datas,centroid,wcss in zipped_pca:  # .map(lambda a,b,c,d,e,f,g,h,i,j:a) :
+
+        # pc_df1 = pd.DataFrame(data=datas, columns=['PC1', 'PC2'])
+        #
+        # pc_df2 = pd.DataFrame(data=centroid, columns=['PC1', 'PC2'])
+
+        fig, ax = plt.subplots(figsize=(10, 8))  # plt.figure(figsize=(10, 8))
+
+        ax.scatter(datas[:,0], datas[:,1], c='blue', label=f'{t[0]}')  # s
+
+        ax.scatter(centroid[:,0], centroid[:,1], c='red', label=f'{t[1]}')  # s
+
+        ax.set_title(f'2D PCA of Images Correlations also Wcss is {wcss}')
+        ax.set_xlabel('Principal Component 1')
+        ax.set_ylabel('Principal Component 2')
+        ax.legend()
+        ax.grid(True)
+
+        plt.tight_layout()
+        plt.show()
+
         print('2D pca has created')  # samq=i[0].shape[0]
 
     return zipped,q,d_input_shape

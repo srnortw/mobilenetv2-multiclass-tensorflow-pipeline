@@ -28,7 +28,7 @@ parser.add_argument(
 parser.add_argument(
     '-res', '--resolution',
     type=int,
-    default=64)
+    default=224)
 
 parser.add_argument('--host', '-hst', type=str, default='', help='Database host')
 parser.add_argument('--port', '-prt', type=str, default='', help='Database port')
@@ -102,7 +102,6 @@ import input_preparation
 zipped,q,d_input_shape=input_preparation.inp_prep_f(zipped,resh,resw,sdaq_df,all_metad_df['loc'],batch_sz)
 
 from input_preparation import shp
-
 
 samq = float(q)#q_rs
 
