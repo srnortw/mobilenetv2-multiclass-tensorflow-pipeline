@@ -25,7 +25,7 @@ parser.add_argument(
 parser.add_argument(
     '-res','--resolution',
     type=int,
-    default=64)
+    default=224)
 
 
 
