@@ -101,6 +101,8 @@ import input_preparation
 # from input_preparation import inp_prep_f
 zipped,q,d_input_shape=input_preparation.inp_prep_f(zipped,resh,resw,sdaq_df,all_metad_df['loc'],batch_sz)
 
+zipped=zipped.cache()
+
 from input_preparation import shp
 
 samq = float(q)#q_rs
@@ -214,9 +216,9 @@ traincv_perc = 1 * perc / (1 - (perc * 2))  # 2 is for cv and test
 train_size = int((1 - traincv_perc) * float(q_tr_trcv))
 
 # Split the dataset
-train_dataset_d = train_traincv_d.take(train_size).cache()
+train_dataset_d = train_traincv_d.take(train_size)#.cache()
 
-traincv_dataset_d = train_traincv_d.skip(train_size).cache()
+traincv_dataset_d = train_traincv_d.skip(train_size)#.cache()
 
 q_cv_test = cv_test_size  # zipped_cv_test.reduce(np.int32(0), lambda x, _: x + 1).numpy()
 
@@ -227,9 +229,9 @@ test_perc = 0.5
 cv_size = int((1 - test_perc) *float(q_cv_test))
 
 # Split the dataset
-cv_dataset_d = cv_test_d.take(cv_size).cache()
+cv_dataset_d = cv_test_d.take(cv_size)#.cache()
 
-test_dataset_d = cv_test_d.skip(cv_size).cache()
+test_dataset_d = cv_test_d.skip(cv_size)#.cache()
 
 
 
