@@ -221,7 +221,7 @@ def inp_prep_f(zipped,resh,resw,sdaq_df,locs_df,batch_sz):
     # o
 
     # o.batch(batch_sz)
-    zipped = zipped.map(lambda a, b, c, d: (tf.cast(a, tf.float32),
+    zipped = zipped.map(lambda a, b, c, d: (a,
                                             b,
                                             c,
                                             tf.cast(z_score_norm(d)[0], tf.float32)

@@ -23,12 +23,12 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '-dn',
     '--dataset_name',
-    default='sports')  # eurosat,satelimgslocs,sports
+    default='eurosat')  # eurosat,satelimgslocs,sports
 
 parser.add_argument(
     '-res', '--resolution',
     type=int,
-    default=224)
+    default=64)
 
 parser.add_argument('--host', '-hst', type=str, default='', help='Database host')
 parser.add_argument('--port', '-prt', type=str, default='', help='Database port')
@@ -100,6 +100,11 @@ resw = res
 import input_preparation
 # from input_preparation import inp_prep_f
 zipped,q,d_input_shape=input_preparation.inp_prep_f(zipped,resh,resw,sdaq_df,all_metad_df['loc'],batch_sz)
+
+
+zipped=zipped.cache(f"processed_datasets/{dataset_name}{res}")
+
+zipped=zipped.map(lambda a,b,c,d,e: (tf.cast(a,tf.float32),b,c,d,e))
 
 from input_preparation import shp
 
@@ -304,7 +309,7 @@ log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 
-optimizer1=tf.keras.optimizers.Adam(learning_rate=5e-5)#1e-5
+optimizer1=tf.keras.optimizers.Adam(learning_rate=5e-6)#1e-5
 loss1=tf.keras.losses.CategoricalCrossentropy(from_logits=True)
 
 # Compile the model
