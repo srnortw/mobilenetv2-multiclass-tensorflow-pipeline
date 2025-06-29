@@ -351,7 +351,7 @@ for dataset in datasets:
 
 
 # Save the entire model as a `.keras` zip archive.
-model.save(f'models/my_model_{dataset_name}{res}.keras')
+model.save(f'models/my_model_{dataset_name}_res{res}.keras')
 
 
 

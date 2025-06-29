@@ -13,50 +13,54 @@ import streamlit as st
 
 import argparse
 
+import os
 
-parser = argparse.ArgumentParser(
-    description='training')
-
-parser.add_argument(
-    '-dn',
-    '--dataset_name',
-    default='sports')#eurosat,satelimgslocs,sports
-
-parser.add_argument(
-    '-res','--resolution',
-    type=int,
-    default=224)
-
-
-
-inputs=parser.parse_args()
-
-dataset_name=inputs.dataset_name
-res=inputs.resolution
+# parser = argparse.ArgumentParser(
+#     description='training')
+#
+# parser.add_argument(
+#     '-dn',
+#     '--dataset_name',
+#     default='sports')#eurosat,satelimgslocs,sports
+#
+# parser.add_argument(
+#     '-res','--resolution',
+#     type=int,
+#     default=224)
+#
+#
+#
+# inputs=parser.parse_args()
+#
+# dataset_name=inputs.dataset_name
+# res=inputs.resolution
 
 
 # dataset_name = st.text_input("dataset_name", "sports")
 # res = int(st.text_input("resolution", "64"))
-
-
 
 # File uploader widget
 uploaded_file = st.file_uploader("Choose a file", type=["jpg", "jpeg", "png"])
 
 
 @st.cache_data
-def prepare(dn):
+def prepare(model_name):
 
-    new_model = tf.keras.models.load_model(f'vision/models/my_model_{dataset_name}{res}.keras')
+    new_model = tf.keras.models.load_model(f'vision/models/{model_name}.keras')
 
     # Show the model architecture
     new_model.summary()
 
-    with open(f"vision/unique_labels_folder/{dataset_name}_unique_labels.pkl", "rb") as f:
+    with open(f"vision/unique_labels_folder/{model_name.split("_")[-2]}_unique_labels.pkl", "rb") as f:
         unique_labels = pickle.load(f)
+
     return new_model,unique_labels
 
-new_model,unique_labels=prepare('sports')
+model_files = [f[:-6] for f in os.listdir('vision/models') if f.endswith(".keras")]
+
+model_name= st.sidebar.radio("Pick A Model",model_files)
+
+new_model,unique_labels=prepare(model_name)
 
 
 @tf.function
@@ -77,24 +81,35 @@ def enter(image_rgb_uint):
 
 if uploaded_file is not None:
     # Display file name
-    st.write("Filename:", uploaded_file.name)
 
-    # Optionally, read contents
     file_content = uploaded_file.read()
-    st.write("File size (bytes):", len(file_content))
 
 
     image_rgb_uint = tf.image.decode_image(file_content)
 
-    image_rgb_uint = tf.image.resize(image_rgb_uint, [res, res], method='nearest')
+    input_shape=new_model.input_shape[1:-1]
 
-    st.image(image_rgb_uint.numpy(), caption="Uploaded Image", width=350)
+    image_rgb_uint = tf.image.resize(image_rgb_uint, input_shape, method='nearest')
 
-    mv,ind=enter(image_rgb_uint)
+    right,left=st.columns(2)
 
-    st.write(f"Our prediction is {unique_labels[ind]} with {100*mv:.2f}% confidence.")
+    with right:
 
-    unique_labels
+        # st.write("Filename:", uploaded_file.name)
+        # # Optionally, read contents
+        # st.write("File size (bytes):", len(file_content))
+
+        st.write(f"Resizing image to {input_shape}")
+
+        st.image(image_rgb_uint.numpy(), caption="Uploaded Image", width=350)
+
+        mv, ind = enter(image_rgb_uint)
+
+        st.write(f"Our prediction is {unique_labels[ind]} with {100*mv:.2f}% confidence.")
+
+    with left:
+
+        unique_labels
 
 
 
