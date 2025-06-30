@@ -12,6 +12,9 @@ import psycopg2 as pg2
 
 import argparse
 
+from dotenv import load_dotenv
+import os
+
 import gdown
 
 import pandas as pd
@@ -71,19 +74,15 @@ if __name__=="__main__":
         '--drive_id',
         default=',')
 
-    parser.add_argument('--host', '-hst', type=str, default='', help='Database host')
-    parser.add_argument('--port', '-prt', type=str, default='', help='Database port')
-    parser.add_argument('--database', '-db', type=str, default='', help='Database name')
-    parser.add_argument('--user', '-us', type=str, default='', help='Database user')
-    parser.add_argument('--password', '-pass', type=str, default='', help='Database password (not secure!)')
-
     inputs=parser.parse_args()
     
     dataset_name=inputs.dataset_name
     data_source_name=inputs.data_source_name
     drive_id=inputs.drive_id
-    
-    sql_d_o=c_sql_d_c(inputs.host, inputs.port, inputs.database, inputs.user,inputs.password)
+
+    load_dotenv()
+    sql_d_o = c_sql_d_c(os.getenv('DB_HOST'), os.getenv('DB_PORT'), os.getenv('DB_NAME'), os.getenv('DB_USER'),
+                                os.getenv('DB_PASSWORD'))
 
     # dropts='''
     # DROP TABLE Satelimgslocs;
