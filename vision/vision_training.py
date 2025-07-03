@@ -68,9 +68,6 @@ dataset_d = dataset.map(parse_example,num_parallel_calls=tf.data.AUTOTUNE)
 
 from input_preparation import shp
 
-
-
-
 import json
 
 def f1(md):
@@ -153,9 +150,9 @@ train_dataset_d=train_dataset_d.batch(batch_size).prefetch(tf.data.experimental.
 
 traincv_dataset_d=traincv_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)#q_tr_trcv-train_size
 
-cv_dataset_d=cv_dataset_d.batch(1).prefetch(tf.data.experimental.AUTOTUNE)
+cv_dataset_d=cv_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
-test_dataset_d=test_dataset_d.batch(1).prefetch(tf.data.experimental.AUTOTUNE)
+test_dataset_d=test_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
 
 
@@ -219,14 +216,34 @@ if os.path.exists(log_dir):
 
 
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+train_summary_writer = tf.summary.create_file_writer(os.path.join(log_dir, "train"))
+traincv_summary_writer = tf.summary.create_file_writer(os.path.join(log_dir, "traincv"))
+
+# tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 
-optimizer1=tf.keras.optimizers.Adam(learning_rate=5e-6)#1e-5
+optimizer1=tf.keras.optimizers.Adam(learning_rate=3e-5)#1e-5
 loss1=tf.keras.losses.CategoricalCrossentropy(from_logits=True)
 
-# Compile the model
-model.compile(optimizer=optimizer1, loss=loss1, metrics=['accuracy'])
+
+# Define our metrics
+train_loss = tf.keras.metrics.Mean('train_loss', dtype=tf.float32)
+train_accuracy = tf.keras.metrics.CategoricalAccuracy('train_accuracy')
+
+traincv_loss = tf.keras.metrics.Mean('traincv_loss', dtype=tf.float32)
+traincv_accuracy = tf.keras.metrics.CategoricalAccuracy('traincv_accuracy')
+
+cv_loss = tf.keras.metrics.Mean('cv_loss', dtype=tf.float32)
+cv_accuracy = tf.keras.metrics.CategoricalAccuracy('cv_accuracy')
+
+test_loss = tf.keras.metrics.Mean('test_loss', dtype=tf.float32)
+test_accuracy = tf.keras.metrics.CategoricalAccuracy('test_accuracy')
+
+
+
+# # Compile the model
+# model.compile(optimizer=optimizer1, loss=loss1, metrics=['accuracy'])
 
 
 # sports64 5e-5 epoch 20,satelimgslocs64 1e-6 epoch 25 maybe less ,eurosat64 5e-6 epoch 25,
@@ -236,25 +253,88 @@ traincv_dataset1=traincv_dataset_d.map(lambda x,y,k:(x,y))
 #train_dataset_d= train_dataset_d.repeat()
 
 
-h=model.fit(train_dataset1,validation_data=traincv_dataset1, epochs=20,callbacks=[tensorboard_callback])#25
-# to see tensorboard try to enter tensorboard --logdir logs/fit inside of command prompt.
+# h=model.fit(train_dataset1,validation_data=traincv_dataset1, epochs=20,callbacks=[tensorboard_callback])#25
+
+epochs=20
+
+@tf.function
+def train_step(x,y):
+  with tf.GradientTape() as tape:
+    # Make a prediction on the batch of images.
+    pred = model(x, training=True)
+    # Pass the predictions to the loss function.
+    loss = loss1(y, pred)
+
+  gradient=tape.gradient(loss,model.trainable_variables)
+  optimizer1.apply_gradients(zip(gradient,model.trainable_variables))
+  train_loss(loss)
+  train_accuracy(y,pred)
+
+@tf.function
+def eval(x,y,dsloss,dsacc):
+  pred=model(x,training=False)
+  loss=loss1(y,pred)
+  dsloss(loss)
+  dsacc(y,pred)
+
+for epoch in range(epochs):
+
+  for x,y in train_dataset1:
+    train_step(x,y)
+
+  # Log training loss to TensorBoard
+  with train_summary_writer.as_default():
+    tf.summary.scalar('loss', train_loss.result(), step=epoch)
+    tf.summary.scalar('accuracy', train_accuracy.result(), step=epoch)
+
+  for x,y in traincv_dataset1:
+    eval(x,y,traincv_loss,traincv_accuracy)
+
+  # Log training loss to TensorBoard
+  with traincv_summary_writer.as_default():
+    tf.summary.scalar('loss', traincv_loss.result(), step=epoch)
+    tf.summary.scalar('accuracy', traincv_accuracy.result(), step=epoch)
 
 
-x=np.arange(len(h.history['loss']))
-y_train=h.history['loss']
-y_val=h.history['val_loss']
+  template = 'Epoch {}, Loss: {}, Accuracy: {}, traincv Loss: {}, traincv Accuracy: {}'
+  print(template.format(epoch+1,
+                         train_loss.result(),
+                         train_accuracy.result()*100,
+                         traincv_loss.result(),
+                         traincv_accuracy.result()*100))
+
+  # Reset metrics every epoch
+  train_loss.reset_state()
+  traincv_loss.reset_state()
+  train_accuracy.reset_state()
+  traincv_accuracy.reset_state()
+
+# x=np.arange(len(h.history['loss']))
+# y_train=h.history['loss']
+# y_val=h.history['val_loss']
 
 import matplotlib.pyplot as plt
+# # to see tensorboard try to enter tensorboard --logdir logs/fit inside of command prompt.
 
 
-plt.plot(x,y_train,color='red')
-plt.plot(x,y_val,color='blue')
-plt.show()
+# plt.plot(x,y_train,color='red')
+# plt.plot(x,y_val,color='blue')
+# plt.show()
+
+for x,y in cv_dataset_d.map(lambda x,y,k:(x,y)):
+  eval(x,y,cv_loss,cv_accuracy)
+
+print(f"cv_loss:{cv_loss.result()} cv_acc:{cv_accuracy.result()}")
+
+for x,y in test_dataset_d.map(lambda x,y,k:(x,y)):
+  eval(x,y,test_loss,test_accuracy)
+
+print(f"test_loss:{test_loss.result()} test_acc:{test_accuracy.result()}")
 
 
-h1=model.evaluate(cv_dataset_d.map(lambda x,y,k:(x,y)))
+# h1=model.evaluate(cv_dataset_d.map(lambda x,y,k:(x,y)))
 
-h2=model.evaluate(test_dataset_d.map(lambda x,y,k:(x,y)))
+# h2=model.evaluate(test_dataset_d.map(lambda x,y,k:(x,y)))
 
 
 from sklearn.metrics import confusion_matrix , classification_report, ConfusionMatrixDisplay
@@ -262,39 +342,7 @@ import seaborn as sns
 
 import pandas as pd
 
-datasets=[traincv_dataset_d.unbatch().batch(1),cv_dataset_d,test_dataset_d]
-
-
-
-# def confusion(pred,des,unique_labels):
-#
-#
-#
-#     ok=sorted(list(set(pred) | set(des)))
-#
-#     oky= [unique_labels[i][:2] for i in ok]
-#
-#     print(len(des))
-#     print(len(pred))
-#     #print(len(f))
-#     cm = confusion_matrix(des,pred)
-#
-#     # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=oky)
-#
-#     # disp.plot(cmap=plt.cm.Blues)
-#
-#     # plt.show()
-#
-#
-#     cm_df = pd.DataFrame(cm, index=oky, columns=oky)
-#     sns.heatmap(cm_df, annot=True, fmt="d", cmap="Blues")
-#     plt.xlabel("Predicted")
-#     plt.ylabel("Actual")
-#     plt.title("Confusion Matrix")
-#     plt.show()
-#
-#     return cm_df
-
+datasets=[traincv_dataset_d,cv_dataset_d,test_dataset_d]
 
 # test_dataset_d1=test_dataset_d.cache()
 # cv_dataset_d1=cv_dataset_d.cache()
