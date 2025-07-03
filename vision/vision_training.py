@@ -136,14 +136,6 @@ test_dataset_d = filter_by_type("test")
 
 # zipped=zipped.cache(f"cached/{dataset_name}{res}")
 
-
-
-
-import tensorflow.keras.layers as layers
-from tensorflow.keras.applications import MobileNetV2,InceptionResNetV2
-from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
-from tensorflow.keras.models import Model
-
 batch_size=64
 
 train_dataset_d=train_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
@@ -155,6 +147,10 @@ cv_dataset_d=cv_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTU
 test_dataset_d=test_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
 
+import tensorflow.keras.layers as layers
+from tensorflow.keras.applications import MobileNetV2,InceptionResNetV2
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+from tensorflow.keras.models import Model
 
 
 # Load MobileNet with pre-trained weights (ImageNet)
@@ -246,7 +242,7 @@ test_accuracy = tf.keras.metrics.CategoricalAccuracy('test_accuracy')
 # model.compile(optimizer=optimizer1, loss=loss1, metrics=['accuracy'])
 
 
-# sports64 5e-5 epoch 20,satelimgslocs64 1e-6 epoch 25 maybe less ,eurosat64 5e-6 epoch 25,
+# sports224 4e-5 epoch 20,satelimgslocs64 1e-6 epoch 25 maybe less ,eurosat64 2e-5 epoch 20,
 train_dataset1=train_dataset_d.map(lambda x,y,k:(x,y))
 traincv_dataset1=traincv_dataset_d.map(lambda x,y,k:(x,y))
 #test_dataset1=test_dataset.map(lambda x,y,k:(x,y))
