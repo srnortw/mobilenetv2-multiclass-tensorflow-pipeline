@@ -225,11 +225,6 @@ cv_dataset_d = cv_test_d.take(cv_size).cache()
 test_dataset_d = cv_test_d.skip(cv_size).cache()
 
 
-import tensorflow.keras.layers as layers
-from tensorflow.keras.applications import MobileNetV2,InceptionResNetV2
-from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
-from tensorflow.keras.models import Model
-
 batch_size=64
 
 train_dataset_d=train_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
@@ -240,6 +235,11 @@ cv_dataset_d=cv_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTU
 
 test_dataset_d=test_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
+
+import tensorflow.keras.layers as layers
+from tensorflow.keras.applications import MobileNetV2,InceptionResNetV2
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+from tensorflow.keras.models import Model
 
 
 
