@@ -100,9 +100,8 @@ if __name__=="__main__":
     '''
 
     sql_d_o.process(create_table_query)
-    
-    
-    
+
+    os.makedirs('tmp', exist_ok=True)
    
     
     zip_file_path = f"tmp/{data_source_name}.zip"

@@ -96,6 +96,7 @@ import input_preparation
 # from input_preparation import inp_prep_f
 zipped,q,d_input_shape=input_preparation.inp_prep_f(zipped,resh,resw,sdaq_df,all_metad_df['loc'],batch_sz)
 
+os.makedirs('processed_datasets', exist_ok=True)
 
 zipped=zipped.cache(f"processed_datasets/{dataset_name}{res}")
 
@@ -235,9 +236,9 @@ train_dataset_d=train_dataset_d.batch(batch_size).prefetch(tf.data.experimental.
 
 traincv_dataset_d=traincv_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)#q_tr_trcv-train_size
 
-cv_dataset_d=cv_dataset_d.batch(1).prefetch(tf.data.experimental.AUTOTUNE)
+cv_dataset_d=cv_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
-test_dataset_d=test_dataset_d.batch(1).prefetch(tf.data.experimental.AUTOTUNE)
+test_dataset_d=test_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
 
 
@@ -342,7 +343,7 @@ import seaborn as sns
 
 import pandas as pd
 
-datasets=[traincv_dataset_d.unbatch().batch(1),cv_dataset_d,test_dataset_d]
+datasets=[traincv_dataset_d,cv_dataset_d,test_dataset_d]
 
 
 

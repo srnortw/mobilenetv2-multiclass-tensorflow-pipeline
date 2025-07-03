@@ -33,6 +33,8 @@ res=inputs.resolution
 
 # st='sports'
 # Load TFRecord file
+import os
+os.makedirs('processed_datasets', exist_ok=True)
 dataset = tf.data.TFRecordDataset(f"processed_datasets/{dataset_name}{res}_images_and_labels.tfrecord",compression_type="GZIP")
 
 

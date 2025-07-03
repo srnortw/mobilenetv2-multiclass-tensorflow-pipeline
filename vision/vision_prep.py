@@ -267,6 +267,7 @@ def serialize_example(x, y, md, dataset_name):
 
 options1 = tf.io.TFRecordOptions(compression_type="GZIP")
 
+os.makedirs('processed_datasets', exist_ok=True)
 # Write TFRecord
 with tf.io.TFRecordWriter(f"processed_datasets/{dataset_name}{res}_images_and_labels.tfrecord",
                           options=options1) as writer:
