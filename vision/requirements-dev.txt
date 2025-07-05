@@ -1,0 +1,12 @@
+numpy
+tensorflow
+opencv-python
+matplotlib
+scikit-learn
+seaborn
+pandas
+h5py
+python-dotenv
+scipy
+psycopg2-binary
+gdown

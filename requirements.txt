@@ -1,13 +1,5 @@
 tensorflow
-numpy
 opencv-python-headless
-matplotlib
-scikit-learn
-seaborn
-pandas
-h5py
 streamlit
-python-dotenv
-scipy
-psycopg2-binary
-gdown
+numpy
+matplotlib
