@@ -1,3 +1,4 @@
+https://testingmobilenetv2.streamlit.app/
 ### c_sql_d.py — Database Setup
 This script:
 
@@ -91,5 +92,3 @@ saves a model to model folder for test_vision_dashb.py
 ### test_vision_dashb.py
 gets all keras model files from models folder and then we can pick model in streamlit dashboard.
 The picked model can predict image who is being sent to streamlit dashboard based on its own categories
-
-https://testingmobilenetv2.streamlit.app/
