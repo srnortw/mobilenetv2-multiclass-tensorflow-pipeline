@@ -17,9 +17,8 @@ We calculate image properties like discrete Gaussian histograms (RGB) and their 
 (mean,standard deviation,skewness,kurtosis)
 
 3-Image Processing
-Each image is processed with the following enhancements
-by entering image,feature wise normalized histogram(rgb) moments,batch size
-in order:
+Each image is processed by entering image,feature wise normalized histogram(rgb) moments,batch size.
+Following enhancements in order:
 
 Histogram Equalization:
 We apply histogram equalization on the Y channel of the YUV color space to avoid shifting the color balance.
