@@ -88,6 +88,18 @@ performs tensorboard,confusion matrix and see images who are miss predicted
 saves a model to model folder for test_vision_dashb.py
 
 
+### vision_prep_and_training.py
+
+This script combines the preprocessing and training steps. It has two main differences compared to using separate scripts:
+
+Caching
+We create a cache file after the first run to speed things up.
+Since we use numpy_function inside a TensorFlow dataset, it switches to eager mode, which slows things down. Caching avoids repeating this.
+
+Training with compile and fit
+Instead of using a custom training loop, we use model.compile() and model.fit() to keep the code clean and easy to update.
+
+
 ### test_vision_dashb.py
 gets all keras model files from models folder and then we can pick model in streamlit dashboard.
 Picked model can predict image who is being sent to streamlit dashboard based on its own categories
