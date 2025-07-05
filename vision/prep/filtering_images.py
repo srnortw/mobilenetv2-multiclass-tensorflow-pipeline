@@ -24,7 +24,7 @@ class filtering_images_c():
     
     #@staticmethod
     #@tf.numpy_function(Tout=[tf.uint8,tf.uint8])
-    def _augment_image(self,image,histogram_moment,m):
+    def ImagePreprocessor(self,image,histogram_moment,m):
         
         
         #org=image

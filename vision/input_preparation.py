@@ -101,7 +101,7 @@ def inp_prep_f(zipped,resh,resw,sdaq_df,locs_df,batch_sz):
                                             b,
                                             c,
                                             d,
-                                            shp(tf.numpy_function(fio._augment_image, [a, d, batch_sz],
+                                            shp(tf.numpy_function(fio.ImagePreprocessor, [a, d, batch_sz],
                                                                   # zipped.cardinality()
                                                                   Tout=tf.uint8), a.shape)  # ,[tf.uint8,tf.uint8]
                                             )
