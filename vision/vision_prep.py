@@ -73,10 +73,13 @@ lids = pd.factorize(all_metad_df['label'])
 
 all_metad_df['label_id'] = lids[0]
 
-unique_labels = lids[1]
+unique_labels = list(lids[1])
 
 with open(f"unique_labels_folder/{dataset_name}_unique_labels.pkl", "wb") as f:
     pickle.dump(unique_labels, f)
+
+import pdb
+pdb.set_trace()
 
 all_metad_ds = tf.data.Dataset.from_tensor_slices(dict(all_metad_df))
 

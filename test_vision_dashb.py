@@ -52,7 +52,7 @@ def prepare(model_name):
     new_model.summary()
 
     with open(f"vision/unique_labels_folder/{model_name.split("_")[-2]}_unique_labels.pkl", "rb") as f:
-        unique_labels = list(pickle.load(f))
+        unique_labels = pickle.load(f)
 
     return new_model,unique_labels
 
