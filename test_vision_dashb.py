@@ -62,6 +62,7 @@ model_name= st.sidebar.radio("Pick A Model",model_files)
 
 new_model,unique_labels=prepare(model_name)
 
+st.write(unique_labels)
 
 @tf.function
 def enter(image_rgb_uint):
