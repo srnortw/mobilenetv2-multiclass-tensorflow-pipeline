@@ -73,7 +73,7 @@ lids = pd.factorize(all_metad_df['label'])
 
 all_metad_df['label_id'] = lids[0]
 
-unique_labels = sorted(lids[1])
+unique_labels = lids[1]
 
 with open(f"unique_labels_folder/{dataset_name}_unique_labels.pkl", "wb") as f:
     pickle.dump(unique_labels, f)

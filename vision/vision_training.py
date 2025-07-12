@@ -120,7 +120,8 @@ df = pd.DataFrame(data_list)
 
 print(df)
 
-unique_labels=sorted(list(set(df['label'])))
+unique_labels=df.sort_values(by='label_id')['label'].unique()
+
 print(unique_labels)
 #x=tf.data.experimental.to_pandas_dataframe(your_dataset)
 
@@ -140,7 +141,7 @@ test_dataset_d = filter_by_type("test")
 
 batch_size=64
 
-train_dataset_d=train_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+train_dataset_d=train_dataset_d.repeat().batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
 traincv_dataset_d=traincv_dataset_d.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)#q_tr_trcv-train_size
 
@@ -157,7 +158,7 @@ from tensorflow.keras.models import Model
 
 # Load MobileNet with pre-trained weights (ImageNet)
 # Set `include_top=False` to exclude the final classification layer
-base_model = MobileNetV2(alpha=1,weights='imagenet', include_top=False, input_shape=d_input_shape)
+base_model = MobileNetV2(alpha=0.5,weights='imagenet', include_top=False, input_shape=d_input_shape)
 
 
 # Optional: Freeze the base model layers to use it as a feature extractor
@@ -221,7 +222,27 @@ traincv_summary_writer = tf.summary.create_file_writer(os.path.join(log_dir, "tr
 # tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 
-optimizer1=tf.keras.optimizers.Adam(learning_rate=3e-5)#1e-5
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate=3e-5,#eurosat
+    decay_steps=1,
+    decay_rate=1,
+    staircase=True  # Set True to decay in discrete steps
+)
+
+
+import matplotlib.pyplot as plt
+
+steps = list(range(20))
+lrs = [lr_schedule(step) for step in steps]
+
+plt.scatter(steps, lrs)
+plt.xlabel("Training step")
+plt.ylabel("Learning rate")
+plt.title("Exponential Decay")
+plt.grid()
+plt.show()
+
+optimizer1=tf.keras.optimizers.Adam(learning_rate=lr_schedule)#1e-5
 loss1=tf.keras.losses.CategoricalCrossentropy(from_logits=True)
 
 
@@ -238,8 +259,6 @@ cv_accuracy = tf.keras.metrics.CategoricalAccuracy('cv_accuracy')
 test_loss = tf.keras.metrics.Mean('test_loss', dtype=tf.float32)
 test_accuracy = tf.keras.metrics.CategoricalAccuracy('test_accuracy')
 
-
-
 # # Compile the model
 # model.compile(optimizer=optimizer1, loss=loss1, metrics=['accuracy'])
 
@@ -254,6 +273,7 @@ traincv_dataset1=traincv_dataset_d.map(lambda x,y,k:(x,y))
 # h=model.fit(train_dataset1,validation_data=traincv_dataset1, epochs=20,callbacks=[tensorboard_callback])#25
 
 epochs=20
+steps_for_epochs=df.shape[0]//batch_size
 
 @tf.function
 def train_step(x,y):
@@ -277,8 +297,13 @@ def eval(x,y,dsloss,dsacc):
 
 for epoch in range(epochs):
 
-  for x,y in train_dataset1:
+  for i,(x,y) in enumerate(train_dataset1):
     train_step(x,y)
+
+    if steps_for_epochs == i:
+      break
+
+
 
   # Log training loss to TensorBoard
   with train_summary_writer.as_default():
