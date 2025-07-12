@@ -52,7 +52,7 @@ def prepare(model_name):
     new_model.summary()
 
     with open(f"vision/unique_labels_folder/{model_name.split("_")[-2]}_unique_labels.pkl", "rb") as f:
-        unique_labels = pickle.load(f)
+        unique_labels = list(pickle.load(f))
 
     return new_model,unique_labels
 
@@ -62,7 +62,6 @@ model_name= st.sidebar.radio("Pick A Model",model_files)
 
 new_model,unique_labels=prepare(model_name)
 
-st.write(unique_labels)
 
 @tf.function
 def enter(image_rgb_uint):
