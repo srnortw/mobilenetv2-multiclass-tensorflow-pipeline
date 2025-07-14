@@ -120,7 +120,7 @@ print("Before resampling:", ratio.numpy())
 eq = tf.constant([1.0 / len(unique_labels)] * len(unique_labels), dtype=tf.float32)
 
 def class_func(a,b,md):
-    return md['label_id']
+    return tf.argmax(b,axis=-1)
 
 zipped = (
     zipped
