@@ -23,8 +23,7 @@ def z_score_norm_trans(x, y):
     u, s = y
     return (x - u) / s
 
-def inp_prep_f(zipped,resh,resw,sdaq_df,locs_df,batch_sz):
-
+def inp_prep_f0(zipped,resh,resw,sdaq_df,locs_df):
 
     # for i in zipped.take(1):
     #     print(i[1]['loc'].numpy().decode())
@@ -37,9 +36,6 @@ def inp_prep_f(zipped,resh,resw,sdaq_df,locs_df,batch_sz):
 
     print(all_imgs.shape)
 
-    num_bins = 256
-    channelq = all_imgs.shape[-1]
-    ipo = images_properties.images_properties_c(channelq, num_bins)
 
     all_imgs = tf.data.Dataset.from_tensor_slices(all_imgs)
 
@@ -49,9 +45,18 @@ def inp_prep_f(zipped,resh,resw,sdaq_df,locs_df,batch_sz):
 
     zipped = zipped.map(lambda a, b, c: (shp(a, a.shape), shp(b, b.shape), {k: shp(v, v.shape) for k, v in c.items()})
                         )
+    return zipped
 
-    zipped = zipped.shuffle(zipped.cardinality(), seed=42)
 
+def inp_prep_f(zipped,batch_sz):
+
+    #
+    # zipped = zipped.shuffle(zipped.cardinality(), seed=42)
+    #
+
+    num_bins = 256
+    channelq = 3
+    ipo = images_properties.images_properties_c(channelq, num_bins)
 
     zipped = zipped.map(lambda a, b, c: (a,
                                          b,

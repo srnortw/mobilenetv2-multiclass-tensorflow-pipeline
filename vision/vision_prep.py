@@ -95,7 +95,55 @@ resw = res
 
 import input_preparation
 # from input_preparation import inp_prep_f
-zipped,q,d_input_shape=input_preparation.inp_prep_f(zipped,resh,resw,sdaq_df,all_metad_df['loc'],batch_sz)
+
+zipped=input_preparation.inp_prep_f0(zipped,resh,resw,sdaq_df,all_metad_df['loc'])
+
+
+initial_state=tf.zeros(len(unique_labels),dtype=tf.int32)
+
+# Reduce function
+def count_fn(state,inp):
+    #indx=md['label_id'].numpy().decode('utf-8')
+    md=inp[2]
+    return tf.tensor_scatter_nd_add(state, [[md['label_id']]], [1])
+
+# Apply take and reduce
+class_counts = zipped.reduce(initial_state=initial_state, reduce_func=count_fn)
+
+ratio=tf.cast(class_counts/tf.reduce_sum(class_counts),tf.float32)
+print("Before resampling:", ratio.numpy())
+
+# eq=1/len(unique_labels)
+#
+# eq=np.zeros(len(unique_labels))+eq
+
+eq = tf.constant([1.0 / len(unique_labels)] * len(unique_labels), dtype=tf.float32)
+
+def class_func(a,b,md):
+    return md['label_id']
+
+zipped = (
+    zipped
+    .rejection_resample(class_func, target_dist=eq,initial_dist=ratio)
+    .map(lambda extra_label, features_and_label: features_and_label)).cache()
+
+# for i,j in enumerate(resample_ds.take(50)):
+#     print(i)
+
+# Apply take and reduce
+resample_counts = zipped.reduce(initial_state=initial_state, reduce_func=count_fn)
+resample_counts=tf.cast(resample_counts,tf.int64)
+
+counts=tf.reduce_sum(resample_counts)
+
+ratio1=tf.cast(resample_counts/counts,tf.float32)
+
+print("After resampling :", ratio1.numpy())
+
+zipped=zipped.apply(tf.data.experimental.assert_cardinality(counts))
+
+
+zipped,q,d_input_shape=input_preparation.inp_prep_f(zipped,batch_sz)
 
 zipped=zipped.cache()
 
